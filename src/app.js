@@ -91,7 +91,7 @@ function detailEmployerInfo() {
 
 function searchForEmployer(employerName) {
     const result = searchEmployer(employerName);
-    if (!result) {
+    if (!result.length) {
         console.log("Employer " + employerName + " is not found.");
     }
 }
@@ -112,8 +112,9 @@ function promptUser() {
         if (userInput === 'exit') {
             rl.close();
         } else {
+            console.log("Searching.....\n");
             searchEmployer(userInput);
-            console.log("\n-----------------");
+            console.log("-----------------\n");
             rl.prompt();
         }
     });

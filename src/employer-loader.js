@@ -24,7 +24,8 @@ function configureFuse(prov) {
             console.log("constructing fuse for " + prov);
         }
         const options = {
-            isCaseSensitive: false
+            isCaseSensitive: false,
+            threshold: 0.3
         }
 
         prov_2_fuse[prov] = new Fuse(employerMap[prov], options);
@@ -66,7 +67,7 @@ export function searchEmployer(userInput) {
         const results = fuseToUse.search(uinput);
         if (results) {
             processResult(prov, results);
-            return results;
+            resultsToReturn.push.apply(resultsToReturn, results);
         }
     } else {
         let result = void 0;
@@ -76,7 +77,8 @@ export function searchEmployer(userInput) {
                 const results = fuseToUse.search(userInput);
                 if (results) {
                     processResult(prov, results);
-                    return result;
+                    resultsToReturn.push.apply(resultsToReturn, results);
+                    console.log("------------------\n");
                 }
             } else if (DEBUG) {
                 console.log("no fuse found for " + prov);
@@ -84,5 +86,5 @@ export function searchEmployer(userInput) {
         }
     }
 
-    return void 0;
+    return resultsToReturn;
 }

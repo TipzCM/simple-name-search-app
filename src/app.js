@@ -2,7 +2,7 @@ import path, { dirname } from 'path';
 import url from 'url';
 import {getEmployerFiles} from './read-files.js';
 import { readText, readPDF } from './read-pdf.js';
-import { addEmployer, getEmployerMap } from './employer-loader.js';
+import { addEmployer, getEmployerMap, searchEmployer } from './employer-loader.js';
 import * as readline from 'node:readline/promises';  // This uses the promise-based APIs
 import { stdin as input, stdout as output } from 'node:process';
 
@@ -16,7 +16,12 @@ function handleData(name, data) {
         // our text files
         const lines = data.split('\n');
         for (const line of lines) {
-            addEmployer(name, line);
+            let employerName = line;
+            if (line.indexOf('\t') != -1) {
+                const parts = line.split('\t'); // nfld has dates and stuff we don't care about
+                employerName = parts[0];
+            }
+            addEmployer(name, employerName);
         }
     } else if (dataType === 'object' && dataType.length) {
         // our pdfs
@@ -85,10 +90,18 @@ function detailEmployerInfo() {
 }
 
 function searchForEmployer(employerName) {
-    
+    const result = searchEmployer(employerName);
+    if (!result) {
+        console.log("Employer " + employerName + " is not found.");
+    }
 }
 
 function promptUser() {
+    console.log("If the province is known, enter the province prefex followed by a colon.\n\n"
+        + "Example: \"NFLD: some employer\" will search in NFLD.\n\n"
+        + "If the province identifier is omitted or not matched, the search will be conducted across all known provinces.");
+    console.log("------------------------------------------------------");
+
     const rl = readline.createInterface({
         input, output
     });
@@ -99,7 +112,8 @@ function promptUser() {
         if (userInput === 'exit') {
             rl.close();
         } else {
-
+            searchEmployer(userInput);
+            console.log("\n-----------------");
             rl.prompt();
         }
     });
